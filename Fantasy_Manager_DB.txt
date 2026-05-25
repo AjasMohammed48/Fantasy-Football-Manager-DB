@@ -1,0 +1,868 @@
+-- Andrew Harrison
+-- Sudhir Ray
+-- Team 9
+-- Dr. Lopa
+-- Project - Fantasy Manager Database
+
+-- ================================================================================================================================================= Create Table: League
+
+-- Create a table for representing Leagues
+CREATE TABLE League (
+    League_ID INT PRIMARY KEY,     -- Unique identifier for each league
+    League_Name VARCHAR(30),       -- Name of the league
+    Total_Teams INT                -- Total number of teams in the league
+);
+
+-- =============================================================================================================================================== Create Table: User
+
+-- Create a table for representing Users
+CREATE TABLE User (
+    User_ID INT PRIMARY KEY,       -- Unique identifier for each user
+    Username VARCHAR(255),         -- Username of the user
+    Email VARCHAR(255),            -- Email address of the user
+    Password VARCHAR(255),         -- Password of the user (Note: In practice, this should be hashed)
+    League_ID INT,                 -- Foreign key referencing the League the user is associated with
+    FOREIGN KEY (League_ID) REFERENCES League(League_ID)  -- Establish a relationship with the League table
+);
+
+-- =============================================================================================================================================== Create Table: Team
+
+-- Create a table for representing Teams
+CREATE TABLE Team (
+    Team_ID INT PRIMARY KEY,       -- Unique identifier for each team
+    Team_Name VARCHAR(255),        -- Name of the team
+    Total_Points INT,              -- Total points earned by the team
+    User_ID INT,                   -- Foreign key referencing the User who owns the team
+    FOREIGN KEY (User_ID) REFERENCES User(User_ID)  -- Establish a relationship with the User table
+);
+
+-- =============================================================================================================================================== Create Table: Real World Team
+
+-- Create a table for representing Real World Teams
+CREATE TABLE Real_World_Team (
+    Real_World_Team_ID INT PRIMARY KEY,       -- Unique identifier for each real-world team
+    Real_World_Team_Name VARCHAR(50)          -- Name of the real-world team
+);
+
+-- =============================================================================================================================================== Create Table: Player
+
+-- Create a table for representing Players
+CREATE TABLE Player (
+    Player_ID INT PRIMARY KEY,               -- Unique identifier for each player
+    First_Name VARCHAR(255),                -- First name of the player
+    Last_Name VARCHAR(255),                 -- Last name of the player
+    Position VARCHAR(50),                   -- Position played by the player
+    Market_Value DECIMAL(10, 2),            -- Market value of the player
+    Injury_Status VARCHAR(50),              -- Injury status of the player
+    Team_ID INT,                            -- Foreign key referencing the Team the player belongs to
+    Real_World_Team_ID INT,                 -- Foreign key referencing the real-world team associated with the player
+    FOREIGN KEY (Team_ID) REFERENCES Team(Team_ID),                   -- Establish a relationship with the Team table
+    FOREIGN KEY (Real_World_Team_ID) REFERENCES Real_World_Team(Real_World_Team_ID)  -- Establish a relationship with the Real_World_Team table
+);
+
+-- =============================================================================================================================================== Create Table: Game Match
+
+-- Create a table for representing Game Matches
+CREATE TABLE GameMatch (
+    Team1_ID INT,                            -- Foreign key referencing the first team in the match
+    Team2_ID INT,                            -- Foreign key referencing the second team in the match
+    Match_Start_Date DATETIME,               -- Start date and time of the match
+    Match_End_Date DATETIME,                 -- End date and time of the match
+    Match_Score VARCHAR(20),                 -- Score of the match
+    Match_Outcome VARCHAR(20),               -- Outcome of the match
+    PRIMARY KEY (Team1_ID, Team2_ID),        -- Composite primary key for match uniqueness
+    FOREIGN KEY (Team1_ID) REFERENCES Team(Team_ID),   -- Relationship with the Team table for Team1
+    FOREIGN KEY (Team2_ID) REFERENCES Team(Team_ID)    -- Relationship with the Team table for Team2
+);
+
+-- =============================================================================================================================================== Create Table: Transfer Market
+
+-- Create a table for representing Transfer Market
+CREATE TABLE TransferMarket (
+    TransferMarket_ID INT AUTO_INCREMENT PRIMARY KEY,		-- Auto generates TransferMarketID
+    Player_ID INT,											-- Foreign Key for PlayerID
+    User_ID INT NULL,										-- Foreign Key for UserID
+    Transfer_Type VARCHAR(50),								-- Transfer Type
+    UNIQUE KEY Player_User_Unique (Player_ID, User_ID),		-- Creates Unique Key For easier transfers
+    FOREIGN KEY (Player_ID) REFERENCES Player(Player_ID),	-- Establish a relationship with the PlayerID
+    FOREIGN KEY (User_ID) REFERENCES User(User_ID)			-- Establish a relationship with the UserID
+);
+
+-- =============================================================================================================================================== Insert Data: League
+
+-- Inserting data into the League table
+INSERT INTO League (League_ID, League_Name, Total_Teams)
+VALUES (1, 'Premier League', 8);
+
+-- =============================================================================================================================================== Insert Data: Users
+
+-- Inserting data into the User table
+INSERT INTO User (User_ID, Username, Email, Password, League_ID)
+VALUES
+    (1, 'SoccerWizardJD', 'john.doe@gmail.com', 'A#b4C6d8Ef0Gh2I', 1),
+    (2, 'AliceKicks', 'alice.smith@yahoo.com', 'Jk1LmN&Op3Qr$St', 1),
+    (3, 'SoccerBob123', 'bob.jenkins@gmail.com', 'U5vXwYz@7A8B9C', 1),
+    (4, 'GoalGetterEmily', 'emily.wang@yahoo.com', 'D1E2Fg3Hi$4JkL', 1),
+    (5, 'KickMasterMike', 'mike.jackson@hotmail.com', 'M5N6oPq7R8s#Tt', 1),
+    (6, 'SoccerStarSara', 'sara.miller@hotmail.com', 'Uv9W0XyZ!1@2#3', 1),
+    (7, 'GoalChaserDave', 'david.white@aol.com', '4aBcD5eFg6H7I$', 1),
+    (8, 'SoccerPassionLiv', 'olivia.jones@gmail.com', 'Jk8LmNoP9Qr$St', 1);
+
+-- =============================================================================================================================================== Insert Data: Fantasy Teams
+
+-- Inserting data into the Team table (fantasy teams created by users)
+INSERT INTO Team (Team_ID, Team_Name, Total_Points, User_ID)
+VALUES
+    (1, 'Dragons FC', 0, 1),
+    (2, 'Titans United', 0, 2),
+    (3, 'Shadow Strikers', 0, 3),
+    (4, 'Phoenix Kings', 0, 4),
+    (5, 'Galactic Stars', 0, 5),
+    (6, 'Nightmare Legends', 0, 6),
+    (7, 'Eternal Warriors', 0, 7),
+    (8, 'Mystic Rangers', 0, 8);
+
+-- =============================================================================================================================================== Insert Data: Real World Teams
+
+-- Inserting data into the Real_World_Team table for Premier League teams
+INSERT INTO Real_World_Team (Real_World_Team_ID, Real_World_Team_Name)
+VALUES
+    (1, 'Manchester United'),
+    (2, 'Manchester City'),
+    (3, 'Liverpool FC'),
+    (4, 'Chelsea FC'),
+    (5, 'Arsenal FC'),
+    (6, 'Tottenham Hotspur'),
+    (7, 'Leicester City'),
+    (8, 'Everton FC'),
+    (9, 'West Ham United'),
+    (10, 'Aston Villa'),
+    (11, 'Newcastle United'),
+    (12, 'Leeds United'),
+    (13, 'Crystal Palace'),
+    (14, 'Southampton FC'),
+    (15, 'Brighton & Hove Albion'),
+    (16, 'AFC Bournemouth'),
+    (17, 'Brentford'),
+    (18, 'Burnley'),
+    (19, 'Fulham'),
+    (20, 'Luton Town'),
+    (21, 'Nottingham Forest'),
+    (22, 'Sheffield United'),
+    (23, 'Wolverhampton Wanderers'),
+    (24, 'Aston Villa'),
+    (25, 'Newcastle United');
+
+-- =============================================================================================================================================== Insert Data: Players
+
+-- Inserting data into the Player table
+INSERT INTO Player (Player_ID, First_Name, Last_Name, Position, Market_Value, Injury_Status, Team_ID, Real_World_Team_ID)
+VALUES
+  (1, 'Tom', 'Heaton', 'Goalkeeper', 65, 'Healthy', NULL, 1),
+  (2, 'André', 'Onana', 'Goalkeeper', 75, 'Healthy', 8, 1),
+  (3, 'Victor', 'Lindelöf', 'Defender', 70, 'Healthy', NULL, 1),
+  (4, 'Harry', 'Maguire', 'Defender', 72, 'Healthy', 4, 1),
+  (5, 'Bruno', 'Fernandes', 'Midfielder', 90, 'Healthy', 2, 1),
+  (6, 'Christian', 'Eriksen', 'Midfielder', 85, 'Healthy', 8, 1),
+  (7, 'Anthony', 'Martial', 'Forward', 80, 'Injured', NULL, 1),
+  (8, 'Marcus', 'Rashford', 'Forward', 88, 'Healthy', NULL, 1),
+  (9, 'Ederson', 'Santana de Moraes', 'Goalkeeper', 80, 'Healthy', NULL, 2),
+  (10, 'Stefan', 'Ortega', 'Goalkeeper', 70, 'Healthy', NULL, 2),
+  (11, 'Rúben', 'Dias', 'Defender', 85, 'Healthy', 3, 2),
+  (12, 'Kyle', 'Walker', 'Defender', 78, 'Healthy', NULL, 2),
+  (13, 'Kevin', 'De Bruyne', 'Midfielder', 95, 'Healthy', 1, 2),
+  (14, 'Rodri', 'Hernández', 'Midfielder', 82, 'Healthy', 7, 2),
+  (15, 'Erling', 'Haaland', 'Forward', 98, 'Healthy', 1, 2),
+  (16, 'Julián', 'Álvarez', 'Forward', 85, 'Healthy', 7, 2),
+  (17, 'Alisson', 'Becker', 'Goalkeeper', 85, 'Healthy', 6, 3),
+  (18, 'Adrián', 'San Miguel', 'Goalkeeper', 70, 'Healthy', NULL, 3),
+  (19, 'Virgil', 'van Dijk', 'Defender', 90, 'Healthy', NULL, 3),
+  (20, 'Joe', 'Gomez', 'Defender', 75, 'Healthy', NULL, 3),
+  (21, 'Thiago', 'Alcântara', 'Midfielder', 88, 'Healthy', NULL, 3),
+  (22, 'Harvey', 'Elliott', 'Midfielder', 78, 'Healthy', NULL, 3),
+  (23, 'Mohamed', 'Salah', 'Forward', 95, 'Healthy', 6, 3),
+  (24, 'Cody', 'Gakpo', 'Forward', 82, 'Healthy', NULL, 3),
+  (25, 'Robert', 'Sanchez', 'Goalkeeper', 75, 'Healthy', 4, 4),
+  (26, 'Marcus', 'Bettinelli', 'Goalkeeper', 65, 'Healthy', 8, 4),
+  (27, 'Levi', 'Colwill', 'Defender', 78, 'Healthy', NULL, 4),
+  (28, 'Axel', 'Disasi', 'Defender', 80, 'Healthy', NULL, 4),
+  (29, 'Enzo', 'Fernandez', 'Midfielder', 85, 'Healthy', NULL, 4),
+  (30, 'Raheem', 'Sterling', 'Midfielder', 90, 'Healthy', NULL, 4),
+  (31, 'Christopher', 'Nkunku', 'Forward', 88, 'Healthy', NULL, 4),
+  (32, 'Nicolas', 'Jackson', 'Forward', 82, 'Healthy', NULL, 4),
+  (33, 'Aaron', 'Ramsdale', 'Goalkeeper', 70, 'Healthy', NULL, 5),
+  (34, 'David', 'Raya', 'Goalkeeper', 68, 'Healthy', NULL, 5),
+  (35, 'Ben', 'White', 'Defender', 75, 'Healthy', 2, 5),
+  (36, 'William', 'Saliba', 'Defender', 77, 'Healthy', 8, 5),
+  (37, 'Thomas', 'Partey', 'Midfielder', 80, 'Healthy', NULL, 5),
+  (38, 'Martin', 'Ødegaard', 'Midfielder', 82, 'Healthy', NULL, 5),
+  (39, 'Bukayo', 'Saka', 'Forward', 85, 'Healthy', 7, 5),
+  (40, 'Gabriel', 'Jesus', 'Forward', 83, 'Healthy', NULL, 5),
+  (41, 'Hugo', 'Lloris', 'Goalkeeper', 75, 'Healthy', 3, 6),
+  (42, 'Guglielmo', 'Vicario', 'Goalkeeper', 70, 'Healthy', NULL, 6),
+  (43, 'Emerson', 'Royal', 'Defender', 72, 'Healthy', 7, 6),
+  (44, 'Cristian', 'Romero', 'Defender', 78, 'Healthy', 6, 6),
+  (45, 'Oliver', 'Skipp', 'Midfielder', 68, 'Healthy', 2, 6),
+  (46, 'Pierre-Emile', 'Højbjerg', 'Midfielder', 73, 'Healthy', NULL, 6),
+  (47, 'Son', 'Heung-Min', 'Forward', 90, 'Healthy', NULL, 6),
+  (48, 'Richarlison', 'de Andrade', 'Forward', 85, 'Healthy', NULL, 6),
+  (49, 'Kasper', 'Schmeichel', 'Goalkeeper', 60, 'Healthy', NULL, 7),
+  (50, 'Danny', 'Ward', 'Goalkeeper', 55, 'Healthy', NULL, 7),
+  (51, 'Çağlar', 'Söyüncü', 'Defender', 65, 'Healthy', 1, 7),
+  (52, 'Wesley', 'Fofana', 'Defender', 70, 'Healthy', 5, 7),
+  (53, 'Youri', 'Tielemans', 'Midfielder', 75, 'Healthy', 2, 7),
+  (54, 'Wilfred', 'Ndidi', 'Midfielder', 68, 'Healthy', NULL, 7),
+  (55, 'Jamie', 'Vardy', 'Forward', 80, 'Healthy', 1, 7),
+  (56, 'Kelechi', 'Iheanacho', 'Forward', 70, 'Healthy', NULL, 7),
+  (57, 'Jordan', 'Pickford', 'Goalkeeper', 65, 'Healthy', NULL, 8),
+  (58, 'Andy', 'Lonergan', 'Goalkeeper', 55, 'Healthy', NULL, 8),
+  (59, 'James', 'Tarkowski', 'Defender', 70, 'Healthy', 4, 8),
+  (60, 'Nathan', 'Patterson', 'Defender', 68, 'Healthy', NULL, 8),
+  (61, 'Amadou', 'Onana', 'Midfielder', 72, 'Healthy', 8, 8),
+  (62, 'Abdoulaye', 'Doucouré', 'Midfielder', 73, 'Healthy', NULL, 8),
+  (63, 'Dwight', 'McNeil', 'Forward', 68, 'Healthy', NULL, 8),
+  (64, 'Dominic', 'Calvert-Lewin', 'Forward', 75, 'Healthy', NULL, 8),
+  (65, 'Lukasz', 'Fabianski', 'Goalkeeper', 80, 'Healthy', 2, 9),
+  (66, 'Darren', 'Randolph', 'Goalkeeper', 60, 'Healthy', 2, 9),
+  (67, 'Vladimir', 'Coufal', 'Defender', 90, 'Healthy', 7, 9),
+  (68, 'Aaron', 'Cresswell', 'Defender', 75, 'Healthy', 8, 9),
+  (69, 'Declan', 'Rice', 'Midfielder', 95, 'Healthy', NULL, 9),
+  (70, 'Tomas', 'Soucek', 'Midfielder', 85, 'Healthy', NULL, 9),
+  (71, 'Michail', 'Antonio', 'Forward', 70, 'Healthy', 2, 9),
+  (72, 'Jarrod', 'Bowen', 'Forward', 65, 'Healthy', 8, 9),
+  (73, 'Emiliano', 'Martínez', 'Goalkeeper', 80, 'Healthy', 4, 10),
+  (74, 'Jed', 'Steer', 'Goalkeeper', 40, 'Healthy', NULL, 10),
+  (75, 'Tyrone', 'Mings', 'Defender', 90, 'Healthy', 8, 10),
+  (76, 'Matt', 'Targett', 'Defender', 60, 'Healthy', NULL, 10),
+  (77, 'John', 'McGinn', 'Midfielder', 70, 'Healthy', NULL, 10),
+  (78, 'Douglas', 'Luiz', 'Midfielder', 80, 'Healthy', NULL, 10),
+  (79, 'Ollie', 'Watkins', 'Forward', 95, 'Healthy', 1, 10),
+  (80, 'Bertrand', 'Traoré', 'Forward', 85, 'Healthy', NULL, 10),
+  (81, 'Martin', 'Dúbravka', 'Goalkeeper', 60, 'Healthy', NULL, 11),
+  (82, 'Karl', 'Darlow', 'Goalkeeper', 40, 'Healthy', NULL, 11),
+  (83, 'Jamaal', 'Lascelles', 'Defender', 70, 'Healthy', 1, 11),
+  (84, 'Federico', 'Fernández', 'Defender', 50, 'Healthy', 2, 11),
+  (85, 'Jonjo', 'Shelvey', 'Midfielder', 60, 'Healthy', 8, 11),
+  (86, 'Isaac', 'Hayden', 'Midfielder', 45, 'Healthy', NULL, 11),
+  (87, 'Callum', 'Wilson', 'Forward', 80, 'Healthy', 8, 11),
+  (88, 'Joelinton', 'Nebroski', 'Forward', 70, 'Healthy', NULL, 11),
+  (89, 'Illan', 'Meslier', 'Goalkeeper', 67, 'Healthy', 1, 12),
+  (90, 'Kristoffer', 'Klaesson', 'Goalkeeper', 61, 'Healthy', 7, 12),
+  (91, 'Luke', 'Ayling', 'Defender', 61, 'Healthy', 6, 12),
+  (92, 'Liam', 'Cooper', 'Defender', 62, 'Healthy', NULL, 12),
+  (93, 'Brenden', 'Aaronson', 'Midfielder', 60, 'Healthy', NULL, 12),
+  (94, 'Tyler', 'Adams', 'Midfielder', 60, 'Healthy', NULL, 12),
+  (95, 'Patrick', 'Bamford', 'Forward', 23, 'Healthy', NULL, 12),
+  (96, 'Rodrigo', 'Moreno', 'Forward', 20, 'Healthy', NULL, 12),
+  (97, 'Sam', 'Johnstone', 'Goalkeeper', 75, 'Healthy', 1, 13),
+  (98, 'Joe', 'Whitworth', 'Goalkeeper', 60, 'Healthy', NULL, 13),
+  (99, 'Joel', 'Ward', 'Defender', 70, 'Healthy', NULL, 13),
+  (100, 'Tyrick', 'Mitchell', 'Defender', 72, 'Healthy', 4, 13),
+  (101, 'Michael', 'Olise', 'Midfielder', 78, 'Healthy', 6, 13),
+  (102, 'Eberechi', 'Eze', 'Midfielder', 80, 'Healthy', NULL, 13),
+  (103, 'Jordan', 'Ayew', 'Forward', 73, 'Healthy', 4, 13),
+  (104, 'Jean-Philippe', 'Mateta', 'Forward', 74, 'Healthy', 2, 13),
+  (105, 'Alex', 'McCarthy', 'Goalkeeper', 70, 'Healthy', NULL, 14),
+  (106, 'Gavin', 'Bazunu', 'Goalkeeper', 72, 'Healthy', NULL, 14),
+  (107, 'Kyle', 'Walker-Peters', 'Defender', 75, 'Healthy', 1, 14),
+  (108, 'Ryan', 'Manning', 'Defender', 68, 'Healthy', 2, 14),
+  (109, 'Flynn', 'Downes', 'Midfielder', 65, 'Healthy', 5, 14),
+  (110, 'Joe', 'Aribo', 'Midfielder', 73, 'Healthy', 4, 14),
+  (111, 'Adam', 'Armstrong', 'Forward', 76, 'Healthy', 4, 14),
+  (112, 'Ché', 'Adams', 'Forward', 74, 'Healthy', 6, 14),
+  (113, 'Jason', 'Steele', 'Goalkeeper', 65, 'Healthy', 7, 15),
+  (114, 'Bart', 'Verbruggen', 'Goalkeeper', 62, 'Healthy', NULL, 15),
+  (115, 'Tariq', 'Lamptey', 'Defender', 74, 'Healthy', NULL, 15),
+  (116, 'Adam', 'Webster', 'Defender', 70, 'Healthy', NULL, 15),
+  (117, 'Solly', 'March', 'Midfielder', 73, 'Healthy', NULL, 15),
+  (118, 'Pascal', 'Groß', 'Midfielder', 76, 'Healthy', NULL, 15),
+  (119, 'Danny', 'Welbeck', 'Forward', 72, 'Healthy', NULL, 15),
+  (120, 'Evan', 'Ferguson', 'Forward', 68, 'Healthy', NULL, 15),
+  (121, 'Darren', 'Randolph', 'Goalkeeper', 50, 'Healthy', NULL, 16),
+  (122, 'Neto', 'Jenkins', 'Goalkeeper', 55, 'Healthy', 5, 16),
+  (123, 'Ryan', 'Fredericks', 'Defender', 60, 'Healthy', NULL, 16),
+  (124, 'Lloyd', 'Kelly', 'Defender', 58, 'Healthy', NULL, 16),
+  (125, 'Lewis', 'Cook', 'Midfielder', 62, 'Healthy', 1, 16),
+  (126, 'David', 'Brooks', 'Midfielder', 65, 'Healthy', 3, 16),
+  (127, 'Dominic', 'Solanke', 'Forward', 70, 'Healthy', 2, 16),
+  (128, 'Dango', 'Ouattara', 'Forward', 68, 'Healthy', NULL, 16),
+  (129, 'Thomas', 'Strakosha', 'Goalkeeper', 55, 'Healthy', NULL, 17),
+  (130, 'Mark', 'Flekken', 'Goalkeeper', 60, 'Healthy', NULL, 17),
+  (131, 'Aaron', 'Hickey', 'Defender', 62, 'Healthy', 7, 17),
+  (132, 'Rico', 'Henry', 'Defender', 60, 'Healthy', NULL, 17),
+  (133, 'Christian', 'Nørgaard', 'Midfielder', 65, 'Healthy', 7, 17),
+  (134, 'Mathias', 'Jensen', 'Midfielder', 63, 'Healthy', NULL, 17),
+  (135, 'Ivan', 'Toney', 'Forward', 70, 'Healthy', NULL, 17),
+  (136, 'Keane', 'Lewis-Potter', 'Forward', 68, 'Healthy', NULL, 17),
+  (137, 'Denis', 'Franchi', 'Goalkeeper', 52, 'Healthy', NULL, 18),
+  (138, 'Arijanet', 'Muric', 'Goalkeeper', 54, 'Healthy', NULL, 18),
+  (139, 'Charlie', 'Taylor', 'Defender', 58, 'Healthy', 5, 18),
+  (140, 'CJ', 'Egan-Riley', 'Defender', 56, 'Healthy', NULL, 18),
+  (141, 'Jack', 'Cork', 'Midfielder', 60, 'Healthy', 1, 18),
+  (142, 'Jóhann', 'Gudmundsson', 'Midfielder', 62, 'Healthy', NULL, 18),
+  (143, 'Jay', 'Rodríguez', 'Forward', 68, 'Healthy', 3, 18),
+  (144, 'Lyle', 'Foster', 'Forward', 66, 'Healthy', NULL, 18),
+  (145, 'Marek', 'Rodák', 'Goalkeeper', 58, 'Healthy', NULL, 19),
+  (146, 'Bernd', 'Leno', 'Goalkeeper', 62, 'Healthy', NULL, 19),
+  (147, 'Kenny', 'Tete', 'Defender', 60, 'Healthy', NULL, 19),
+  (148, 'Tosin', 'Adarabioyo', 'Defender', 59, 'Healthy', NULL, 19),
+  (149, 'Harrison', 'Reed', 'Midfielder', 61, 'Healthy', NULL, 19),
+  (150, 'Harry', 'Wilson', 'Midfielder', 64, 'Healthy', 7, 19),
+  (151, 'Bobby', 'De Cordova-Reid', 'Forward', 67, 'Healthy', NULL, 19),
+  (152, 'Willian', 'Gerald', 'Forward', 65, 'Healthy', NULL, 19),
+  (153, 'James', 'Shea', 'Goalkeeper', 52, 'Healthy', NULL, 20),
+  (154, 'Thomas', 'Kaminski', 'Goalkeeper', 54, 'Healthy', 5, 20),
+  (155, 'Dan', 'Potts', 'Defender', 55, 'Healthy', NULL, 20),
+  (156, 'Tom', 'Lockyer', 'Defender', 57, 'Healthy', NULL, 20),
+  (157, 'Luke', 'Berry', 'Midfielder', 58, 'Healthy', 3, 20),
+  (158, 'Pelly', 'Ruddock Mpanzu', 'Midfielder', 60, 'Healthy', 3, 20),
+  (159, 'Carlton', 'Morris', 'Forward', 62, 'Healthy', 3, 20),
+  (160, 'Cauley', 'Woodrow', 'Forward', 61, 'Healthy', NULL, 20),
+  (161, 'Wayne', 'Hennessey', 'Goalkeeper', 55, 'Healthy', NULL, 21),
+  (162, 'Ethan', 'Horvath', 'Goalkeeper', 57, 'Healthy', 6, 21),
+  (163, 'Joe', 'Worrall', 'Defender', 60, 'Healthy', 5, 21),
+  (164, 'Neco', 'Williams', 'Defender', 62, 'Healthy', 6, 21),
+  (165, 'Orel', 'Mangala', 'Midfielder', 64, 'Healthy', 6, 21),
+  (166, 'Morgan', 'Gibbs-White', 'Midfielder', 66, 'Healthy', 6, 21),
+  (167, 'Taiwo', 'Awoniyi', 'Forward', 68, 'Healthy', 3, 21),
+  (168, 'Chris', 'Wood', 'Forward', 70, 'Healthy', NULL, 21),
+  (169, 'Adam', 'Davies', 'Goalkeeper', 50, 'Healthy', NULL, 22),
+  (170, 'Wes', 'Foderingham', 'Goalkeeper', 52, 'Healthy', NULL, 22),
+  (171, 'George', 'Baldock', 'Defender', 54, 'Healthy', NULL, 22),
+  (172, 'Chris', 'Basham', 'Defender', 56, 'Healthy', NULL, 22),
+  (173, 'John', 'Fleck', 'Midfielder', 58, 'Healthy', NULL, 22),
+  (174, 'Oliver', 'Norwood', 'Midfielder', 60, 'Healthy', NULL, 22),
+  (175, 'Rhian', 'Brewster', 'Forward', 62, 'Healthy', 7, 22),
+  (176, 'Oliver', 'McBurnie', 'Forward', 64, 'Healthy', 4, 22),
+  (177, 'José', 'Sá', 'Goalkeeper', 60, 'Healthy', NULL, 23),
+  (178, 'Dan', 'Bentley', 'Goalkeeper', 58, 'Healthy', NULL, 23),
+  (179, 'Rayan', 'Aït-Nouri', 'Defender', 62, 'Healthy', 3, 23),
+  (180, 'Craig', 'Dawson', 'Defender', 64, 'Healthy', NULL, 23),
+  (181, 'Mario', 'Lemina', 'Midfielder', 66, 'Healthy', 4, 23),
+  (182, 'Pablo', 'Sarabia', 'Midfielder', 68, 'Healthy', 4, 23),
+  (183, 'Pedro', 'Neto', 'Forward', 70, 'Healthy', NULL, 23),
+  (184, 'Hwang', 'Hee-Chan', 'Forward', 72, 'Healthy', 6, 23),
+  (185, 'Emiliano', 'Martínez', 'Goalkeeper', 65, 'Healthy', 3, 24),
+  (186, 'Robin', 'Olsen', 'Goalkeeper', 60, 'Healthy', NULL, 24),
+  (187, 'Matty', 'Cash', 'Defender', 70, 'Healthy', 3, 24),
+  (188, 'Diego', 'Carlos', 'Defender', 68, 'Healthy', NULL, 24),
+  (189, 'Douglas', 'Luiz', 'Midfielder', 75, 'Healthy', NULL, 24),
+  (190, 'John', 'McGinn', 'Midfielder', 73, 'Healthy', 5, 24),
+  (191, 'Kadan', 'Young', 'Forward', 65, 'Healthy', 5, 24),
+  (192, 'Ollie', 'Watkins', 'Forward', 80, 'Healthy', 5, 24),
+  (193, 'Martin', 'Dúbravka', 'Goalkeeper', 68, 'Healthy', NULL, 25),
+  (194, 'Loris', 'Karius', 'Goalkeeper', 62, 'Healthy', NULL, 25),
+  (195, 'Kieran', 'Trippier', 'Defender', 74, 'Healthy', NULL, 25),
+  (196, 'Paul', 'Dummett', 'Defender', 66, 'Healthy', NULL, 25),
+  (197, 'Matt', 'Ritchie', 'Midfielder', 70, 'Healthy', 5, 25),
+  (198, 'Jacob', 'Murphy', 'Midfielder', 72, 'Healthy', NULL, 25),
+  (199, 'Joelinton', '', 'Forward', 75, 'Healthy', 5, 25),
+  (200, 'Anthony', 'Gordon', 'Forward', 78, 'Healthy', 8, 25);
+
+-- =============================================================================================================================================== Insert Data: Transfer Market
+
+-- Inserting data into transfer market
+INSERT INTO TransferMarket (Player_ID, User_ID, Transfer_Type)
+VALUES
+  (1, NULL, 'Available'),
+  (2, 8, 'Unavailable'),
+  (3, NULL, 'Available'),
+  (4, 4, 'Unavailable'),
+  (5, 2, 'Unavailable'),
+  (6, 8, 'Unavailable'),
+  (7, NULL, 'Available'),
+  (8, NULL, 'Available'),
+  (9, NULL, 'Available'),
+  (10, NULL, 'Available'),
+  (11, 3, 'Unavailable'),
+  (12, NULL, 'Available'),
+  (13, 1, 'Unavailable'),
+  (14, 7, 'Unavailable'),
+  (15, 1, 'Unavailable'),
+  (16, 7, 'Unavailable'),
+  (17, 6, 'Unavailable'),
+  (18, NULL, 'Available'),
+  (19, NULL, 'Available'),
+  (20, NULL, 'Available'),
+  (21, NULL, 'Available'),
+  (22, NULL, 'Available'),
+  (23, 6, 'Unavailable'),
+  (24, NULL, 'Available'),
+  (25, 4, 'Unavailable'),
+  (26, 8, 'Unavailable'),
+  (27, NULL, 'Available'),
+  (28, NULL, 'Available'),
+  (29, NULL, 'Available'),
+  (30, NULL, 'Available'),
+  (31, NULL, 'Available'),
+  (32, NULL, 'Available'),
+  (33, NULL, 'Available'),
+  (34, NULL, 'Available'),
+  (35, 2, 'Unavailable'),
+  (36, 8, 'Unavailable'),
+  (37, NULL, 'Available'),
+  (38, NULL, 'Available'),
+  (39, 7, 'Unavailable'),
+  (40, NULL, 'Available'),
+  (41, 3, 'Unavailable'),
+  (42, NULL, 'Available'),
+  (43, 7, 'Unavailable'),
+  (44, 6, 'Unavailable'),
+  (45, 2, 'Unavailable'),
+  (46, NULL, 'Available'),
+  (47, NULL, 'Available'),
+  (48, NULL, 'Available'),
+  (49, NULL, 'Available'),
+  (50, NULL, 'Available'),
+  (51, 1, 'Unavailable'),
+  (52, 5, 'Unavailable'),
+  (53, 2, 'Unavailable'),
+  (54, NULL, 'Available'),
+  (55, 1, 'Unavailable'),
+  (56, NULL, 'Available'),
+  (57, NULL, 'Available'),
+  (58, NULL, 'Available'),
+  (59, 4, 'Unavailable'),
+  (60, NULL, 'Available'),
+  (61, 8, 'Unavailable'),
+  (62, NULL, 'Available'),
+  (63, NULL, 'Available'),
+  (64, NULL, 'Available'),
+  (65, 2, 'Unavailable'),
+  (66, NULL, 'Available'),
+  (67, 7, 'Unavailable'),
+  (68, 8, 'Unavailable'),
+  (69, NULL, 'Available'),
+  (70, NULL, 'Available'),
+  (71, 2, 'Unavailable'),
+  (72, 8, 'Unavailable'),
+  (73, 4, 'Unavailable'),
+  (74, NULL, 'Available'),
+  (75, 8, 'Unavailable'),
+  (76, NULL, 'Available'),
+  (77, NULL, 'Available'),
+  (78, NULL, 'Available'),
+  (79, 1, 'Unavailable'),
+  (80, NULL, 'Available'),
+  (81, NULL, 'Available'),
+  (82, NULL, 'Available'),
+  (83, 1, 'Unavailable'),
+  (84, 2, 'Unavailable'),
+  (85, 8, 'Unavailable'),
+  (86, NULL, 'Available'),
+  (87, 8, 'Unavailable'),
+  (88, NULL, 'Available'),
+  (89, 1, 'Unavailable'),
+  (90, 7, 'Unavailable'),
+  (91, 6, 'Unavailable'),
+  (92, NULL, 'Available'),
+  (93, NULL, 'Available'),
+  (94, NULL, 'Available'),
+  (95, NULL, 'Available'),
+  (96, NULL, 'Available'),
+  (97, 1, 'Unavailable'),
+  (98, NULL, 'Available'),
+  (99, NULL, 'Available'),
+  (100, 4, 'Unavailable'),
+  (101, 6, 'Unavailable'),
+  (102, NULL, 'Available'),
+  (103, 4, 'Unavailable'),
+  (104, 2, 'Unavailable'),
+  (105, NULL, 'Available'),
+  (106, NULL, 'Available'),
+  (107, 1, 'Unavailable'),
+  (108, 2, 'Unavailable'),
+  (109, 5, 'Unavailable'),
+  (110, 4, 'Unavailable'),
+  (111, NULL, 'Available'),
+  (112, 6, 'Unavailable'),
+  (113, 7, 'Unavailable'),
+  (114, NULL, 'Available'),
+  (115, NULL, 'Available'),
+  (116, NULL, 'Available'),
+  (117, NULL, 'Available'),
+  (118, NULL, 'Available'),
+  (119, NULL, 'Available'),
+  (120, NULL, 'Available'),
+  (121, NULL, 'Available'),
+  (122, 5, 'Unavailable'),
+  (123, NULL, 'Available'),
+  (124, NULL, 'Available'),
+  (125, 1, 'Unavailable'),
+  (126, 3, 'Unavailable'),
+  (127, 2, 'Unavailable'),
+  (128, NULL, 'Available'),
+  (129, NULL, 'Available'),
+  (130, NULL, 'Available'),
+  (131, 7, 'Unavailable'),
+  (132, NULL, 'Available'),
+  (133, 7, 'Unavailable'),
+  (134, NULL, 'Available'),
+  (135, NULL, 'Available'),
+  (136, NULL, 'Available'),
+  (137, NULL, 'Available'),
+  (138, NULL, 'Available'),
+  (139, 5, 'Unavailable'),
+  (140, NULL, 'Available'),
+  (141, 1, 'Unavailable'),
+  (142, NULL, 'Available'),
+  (143, 3, 'Unavailable'),
+  (144, NULL, 'Available'),
+  (145, NULL, 'Available'),
+  (146, NULL, 'Available'),
+  (147, NULL, 'Available'),
+  (148, NULL, 'Available'),
+  (149, NULL, 'Available'),
+  (150, 7, 'Unavailable'),
+  (151, NULL, 'Available'),
+  (152, NULL, 'Available'),
+  (153, NULL, 'Available'),
+  (154, 5, 'Unavailable'),
+  (155, NULL, 'Available'),
+  (156, NULL, 'Available'),
+  (157, 3, 'Unavailable'),
+  (158, 3, 'Unavailable'),
+  (159, 3, 'Unavailable'),
+  (160, NULL, 'Available'),
+  (161, NULL, 'Available'),
+  (162, 6, 'Unavailable'),
+  (163, 5, 'Unavailable'),
+  (164, 6, 'Unavailable'),
+  (165, 6, 'Unavailable'),
+  (166, 6, 'Unavailable'),
+  (167, 3, 'Unavailable'),
+  (168, NULL, 'Available'),
+  (169, NULL, 'Available'),
+  (170, NULL, 'Available'),
+  (171, NULL, 'Available'),
+  (172, NULL, 'Available'),
+  (173, NULL, 'Available'),
+  (174, NULL, 'Available'),
+  (175, 7, 'Unavailable'),
+  (176, 4, 'Unavailable'),
+  (177, NULL, 'Available'),
+  (178, NULL, 'Available'),
+  (179, 3, 'Unavailable'),
+  (180, NULL, 'Available'),
+  (181, 4, 'Unavailable'),
+  (182, 4, 'Unavailable'),
+  (183, NULL, 'Available'),
+  (184, 6, 'Unavailable'),
+  (185, 3, 'Unavailable'),
+  (186, NULL, 'Available'),
+  (187, 3, 'Unavailable'),
+  (188, NULL, 'Available'),
+  (189, NULL, 'Available'),
+  (190, 5, 'Unavailable'),
+  (191, 5, 'Available'),
+  (192, 5, 'Available'),
+  (193, NULL, 'Available'),
+  (194, NULL, 'Available'),
+  (195, NULL, 'Available'),
+  (196, NULL, 'Available'),
+  (197, 5, 'Unavailable'),
+  (198, NULL, 'Available'),
+  (199, 5, 'Available'),
+  (200, 8, 'Unavailable');
+
+-- =============================================================================================================================================== Insert Data: Matches
+
+-- Insert data into Matches
+INSERT INTO GameMatch (Team1_ID, Team2_ID, Match_Start_Date, Match_End_Date, Match_Score, Match_Outcome)
+VALUES 
+-- Week 1 Matches
+(1, 2, '2023-01-02', '2023-01-08', '5-1', 'HOME WINS'),
+(3, 4, '2023-01-02', '2023-01-08', '1-3', 'AWAY WINS'),
+(5, 6, '2023-01-02', '2023-01-08', '2-4', 'AWAY WINS'),
+(7, 8, '2023-01-02', '2023-01-08', '1-5', 'AWAY WINS'),
+
+-- Week 2 Matches
+(3, 1, '2023-01-09', '2023-01-15', '1-4', 'AWAY WINS'),
+(4, 2, '2023-01-09', '2023-01-15', '5-2', 'HOME WINS'),
+(5, 7, '2023-01-09', '2023-01-15', '3-5', 'AWAY WINS'),
+(6, 8, '2023-01-09', '2023-01-15', '4-1', 'HOME WINS'),
+
+-- Week 3 Matches
+(1, 4, '2023-01-16', '2023-01-22', '5-0', 'HOME WINS'),
+(2, 3, '2023-01-16', '2023-01-22', '4-3', 'HOME WINS'),
+(5, 8, '2023-01-16', '2023-01-22', '2-5', 'AWAY WINS'),
+(6, 7, '2023-01-16', '2023-01-22', '1-4', 'AWAY WINS'),
+
+-- Week 4 Matches
+(5, 1, '2023-01-23', '2023-01-29', '1-3', 'AWAY WINS'),
+(2, 6, '2023-01-23', '2023-01-29', '0-5', 'AWAY WINS'),
+(7, 3, '2023-01-23', '2023-01-29', '2-5', 'AWAY WINS'),
+(4, 8, '2023-01-23', '2023-01-29', '5-1', 'HOME WINS'),
+
+-- Week 5 Matches
+(1, 6, '2023-01-30', '2023-02-05', '5-2', 'HOME WINS'),
+(5, 2, '2023-01-30', '2023-02-05', '1-4', 'AWAY WINS'),
+(3, 8, '2023-01-30', '2023-02-05', '0-5', 'AWAY WINS'),
+(4, 7, '2023-01-30', '2023-02-05', '3-5', 'AWAY WINS'),
+
+-- Week 6 Matches
+(7, 1, '2023-02-06', '2023-02-12', '1-5', 'AWAY WINS'),
+(2, 8, '2023-02-06', '2023-02-12', '5-1', 'HOME WINS'),
+(6, 3, '2023-02-06', '2023-02-12', '2-3', 'AWAY WINS'),
+(4, 5, '2023-02-06', '2023-02-12', '4-2', 'HOME WINS'),
+
+-- Week 7 Matches
+(1, 8, '2023-02-13', '2023-02-19', '5-3', 'HOME WINS'),
+(2, 7, '2023-02-13', '2023-02-19', '2-5', 'AWAY WINS'),
+(3, 5, '2023-02-13', '2023-02-19', '4-0', 'HOME WINS'),
+(4, 6, '2023-02-13', '2023-02-19', '1-5', 'AWAY WINS');
+
+
+
+-- SQL Queries
+
+-- =============================================================================================================================================== Query 1: Andrew Harrison
+
+-- Select columns from Team and Player tables
+SELECT T.Team_ID,    
+       T.Team_Name,  
+       P.Player_ID,  
+       P.First_Name,
+       P.Last_Name,  
+       P.Position 
+	   
+FROM Team AS T       -- From the Team table, aliased as T
+
+-- Perform an inner join with the Player table, aliased as P
+INNER JOIN Player AS P 
+
+-- Join condition: Match Team_ID in both tables
+ON T.Team_ID = P.Team_ID  -- The join is made where Team IDs match between Team and Player tables
+
+ORDER BY T.Team_ID ASC,  -- Orders the results by Team ID in ascending order
+         P.Position ASC; -- Then orders by Player Position in ascending order
+
+-- =============================================================================================================================================== Query 2: Andrew Harrison
+
+-- Select player information along with team names, injury status, and positions
+SELECT T.Team_Name,     
+       P.First_Name,     
+       P.Last_Name,    
+       P.Injury_Status,    
+       P.Position          
+
+FROM Player AS P           -- From the Player table, aliased as P
+
+INNER JOIN Team AS T       -- Inner join with the Team table, aliased as T
+ON P.Team_ID = T.Team_ID   -- Join is made where Team IDs match between Player and Team tables
+
+WHERE P.Team_ID IS NOT NULL  -- Filter to include only players with an actual team
+
+ORDER BY T.Team_Name ASC,   -- Order the results by team name in ascending order
+         P.Position ASC;    -- Then, order by player position in ascending order
+
+-- =============================================================================================================================================== Query 3: Andrew Harrison
+
+-- Select the position, first name, and last name
+SELECT P.Position,          
+       MAX(P.Market_Value) as Max_Value, -- Select the maximum market value for players in each position
+       MAX(P.First_Name) as First_Name,
+       MAX(P.Last_Name) as Last_Name 
+
+FROM Player AS P                        -- From the Player table, aliased as P
+
+GROUP BY P.Position;                 -- Group the results by the player's position
+
+-- =============================================================================================================================================== Query 4: Andrew Harrison
+
+-- Select the real world team name and calculate the average market value of players
+SELECT RWT.Real_World_Team_Name,                   
+       AVG(P.Market_Value) as Avg_Market_Value    
+
+FROM Real_World_Team RWT                        -- From the Real_World_Team table, aliased as RWT
+
+JOIN Player P                                   -- Join with the Player table, aliased as P
+ON RWT.Real_World_Team_ID = P.Real_World_Team_ID  -- Join condition: match the real-world team ID from both tables
+
+GROUP BY RWT.Real_World_Team_Name;              -- Group the results by the real-world team name
+
+-- =============================================================================================================================================== Query 5: Andrew Harrison
+
+-- Select first name, last name, position, market value, and availability status of players with market value >= 75
+SELECT First_Name, Last_Name, Position, Market_Value,
+       CASE
+           WHEN Team_ID IS NULL THEN 'Unavailable'  -- If the player doesn't have a team, their availability is "Unavailable"
+           ELSE 'Available'                          -- If the player has a team, their availability is "Available"
+       END AS Availability
+FROM Player
+WHERE Market_Value >= 75  -- Filter for players with a market value greater than or equal to 75
+ORDER BY Market_Value DESC; -- Order the results by market value in descending order
+
+-- =============================================================================================================================================== Query 6: Sudhir Ray
+
+-- Retrieve usernames and fantasy team names for all users
+SELECT User.Username, Team.Team_Name
+FROM User
+JOIN Team ON User.User_ID = Team.User_ID;
+
+-- =============================================================================================================================================== Query 7: Sudhir Ray
+
+-- Fetch real-world team names and players associated with each team
+SELECT Real_World_Team.Real_World_Team_Name, Player.First_Name, Player.Last_Name, Player.Position
+FROM Real_World_Team
+JOIN Player ON Real_World_Team.Real_World_Team_ID = Player.Real_World_Team_ID
+ORDER BY Real_World_Team_Name;
+
+-- =============================================================================================================================================== Query 8: Sudhir Ray
+
+-- Selecting info of all Undrafted Players
+SELECT Player.Player_ID, Player.First_Name, Player.Last_Name, Player.Position, Player.Market_Value, TransferMarket.Transfer_Type, Real_World_Team.Real_World_Team_Name
+FROM Player AS Player
+LEFT JOIN TransferMarket AS TransferMarket ON Player.Player_ID = TransferMarket.Player_ID
+LEFT JOIN Real_World_Team AS Real_World_Team ON Player.Real_World_Team_ID = Real_World_Team.Real_World_Team_ID
+WHERE Player.Team_ID IS NULL;
+     
+-- =============================================================================================================================================== Query 9: Sudhir Ray
+
+-- Display upcoming game matches and participating fantasy teams with only dates
+SELECT DATE(Match_Start_Date) AS Match_Start_Date, 
+       DATE(Match_End_Date) AS Match_End_Date, 
+       Team1.Team_Name AS Home_Team, 
+       Team2.Team_Name AS Away_Team, 
+       Match_Outcome
+FROM GameMatch                     
+INNER JOIN Team AS Team1 ON GameMatch.Team1_ID = Team1.Team_ID  
+INNER JOIN Team AS Team2 ON GameMatch.Team2_ID = Team2.Team_ID 
+ORDER BY Match_Start_Date ASC;
+
+-- =============================================================================================================================================== Query 10: Sudhir Ray
+
+-- Fetch users and players transferred by each user
+SELECT User.Username, Player.First_Name, Player.Last_Name
+FROM User
+JOIN TransferMarket ON User.User_ID = TransferMarket.User_ID
+JOIN Player ON TransferMarket.Player_ID = Player.Player_ID;
+
+-- =============================================================================================================================================== Query 11: Extra
+
+-- Select statement to retrieve data
+SELECT COUNT(*) AS DraftedPlayers  -- Count the number of rows and rename the result as "DraftedPlayers"
+FROM Player                       -- Specify the table "Player" to retrieve data from
+WHERE Team_ID IS NOT NULL;        -- Filter the rows to include only those where "Team_ID" is not NULL
+
+-- =============================================================================================================================================== Query 12: Extra
+
+-- Select statement to retrieve data
+SELECT COUNT(*) AS UndraftedPlayers  -- Count the number of rows and rename the result as "UndraftedPlayers"
+FROM Player                       -- Specify the table "Player" to retrieve data from
+WHERE Team_ID IS NULL;        -- Filter the rows to include only those where "Team_ID" is NULL
+
+-- =============================================================================================================================================== Query 13: Extra
+
+-- Select the match start and end dates (without time), first team, and second team
+SELECT DATE(GM.Match_Start_Date) AS Match_Start_Date, 
+       DATE(GM.Match_End_Date) AS Match_End_Date,
+       T1.Team_Name AS Home_Team, 
+       T2.Team_Name AS Away_Team,   
+
+    -- Determines the likely winner based on total market value comparison
+    CASE 
+        WHEN T1.Total_Market_Value > T2.Total_Market_Value THEN T1.Team_Name
+        WHEN T1.Total_Market_Value < T2.Total_Market_Value THEN T2.Team_Name
+        ELSE 'Tie'  -- If the market values are equal, the result is a 'Tie'
+    END AS Likely_Winner
+
+FROM GameMatch AS GM  -- From the GameMatch table, aliased as GM
+
+-- Joining the GameMatch table with a subquery that calculates each team's total market value
+JOIN (SELECT T.Team_ID, 
+             T.Team_Name,
+             SUM(P.Market_Value) AS Total_Market_Value  -- Calculating the total market value for each team
+     FROM Team AS T  -- From the Team table, aliased as T
+     
+	 JOIN Player AS P ON T.Team_ID = P.Team_ID  -- Join with the Player table to include player market values
+     
+	 GROUP BY T.Team_ID, T.Team_Name) T1 ON GM.Team1_ID = T1.Team_ID  -- Join condition for the first team
+
+JOIN (SELECT T.Team_ID, 
+             T.Team_Name,
+             SUM(P.Market_Value) AS Total_Market_Value  -- Repeating the process for the second team
+     FROM Team AS T
+     
+	 JOIN Player AS P ON T.Team_ID = P.Team_ID
+     
+	 GROUP BY T.Team_ID, T.Team_Name) T2 ON GM.Team2_ID = T2.Team_ID  -- Join condition for the second team
+
+ORDER BY GM.Match_Start_Date ASC;  -- Ordering the results by the match start date in ascending order
+
+
+-- =============================================================================================================================================== Query 14: Extra
+
+SELECT T.Team_Name,
+       IFNULL(WinCount.Predicted_Wins, 0) AS Predicted_Wins
+FROM Team AS T
+
+LEFT JOIN (SELECT Winner.Team_Name,
+                  COUNT(*) AS Predicted_Wins
+     
+	 FROM (SELECT CASE 
+                      WHEN T1.Total_Market_Value > T2.Total_Market_Value THEN T1.Team_Name
+                      WHEN T1.Total_Market_Value < T2.Total_Market_Value THEN T2.Team_Name
+                      ELSE NULL 
+                  END AS Team_Name
+           FROM GameMatch AS GM
+           
+		   JOIN (SELECT T.Team_ID, 
+                        T.Team_Name,
+                        SUM(P.Market_Value) AS Total_Market_Value
+                 FROM Team AS T
+                
+				 JOIN Player AS P ON T.Team_ID = P.Team_ID
+                 
+				 GROUP BY T.Team_ID, T.Team_Name) T1 ON GM.Team1_ID = T1.Team_ID
+           
+		   JOIN (SELECT T.Team_ID, 
+                        T.Team_Name,
+                        SUM(P.Market_Value) AS Total_Market_Value
+                 FROM Team AS T
+               
+			     JOIN Player AS P ON T.Team_ID = P.Team_ID
+               
+			     GROUP BY T.Team_ID, T.Team_Name) T2 ON GM.Team2_ID = T2.Team_ID
+                ) Winner
+     WHERE Winner.Team_Name IS NOT NULL
+     
+	 GROUP BY Winner.Team_Name) WinCount ON T.Team_Name = WinCount.Team_Name
+
+ORDER BY Predicted_Wins DESC;
+
+-- =============================================================================================================================================== Query 15: Extra
+
+SELECT CASE 
+         WHEN T.Team_Name IS NULL THEN 'Undrafted'
+         ELSE T.Team_Name
+       END AS Team_Name,     
+       P.First_Name,     
+       P.Last_Name,    
+       CASE 
+         WHEN P.Injury_Status = 'Injured' THEN '**Injured**'
+         ELSE P.Injury_Status
+       END AS Injury_Status,   
+       P.Position          
+
+FROM Player AS P           -- From the Player table, aliased as P
+
+LEFT JOIN Team AS T        -- Left join with the Team table, aliased as T
+ON P.Team_ID = T.Team_ID   -- Join is made where Team IDs match between Player and Team tables
+
+ORDER BY Team_Name ASC,    -- Order the results by team name (including 'Undrafted') in ascending order
+         P.Position ASC;   -- Then, order by player position in ascending order
+
+-- =============================================================================================================================================== Query 16: Extra
+
+-- Display match week, teams, outcome, and score
+SELECT DATE(Match_Start_Date) AS Week_Start, 
+       DATE(Match_End_Date) AS Week_End, 
+       Team1.Team_Name AS Home_Team, 
+       Team2.Team_Name AS Away_Team, 
+       Match_Score,
+       Match_Outcome
+FROM GameMatch                     
+INNER JOIN Team AS Team1 ON GameMatch.Team1_ID = Team1.Team_ID  
+INNER JOIN Team AS Team2 ON GameMatch.Team2_ID = Team2.Team_ID 
+ORDER BY Week_Start ASC;
