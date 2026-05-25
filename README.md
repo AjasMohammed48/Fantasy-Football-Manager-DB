@@ -4,12 +4,9 @@ A relational database system built with MySQL that powers a fantasy football (so
 
 ---
 
-## 👥 Authors
+## 👥 Author
 
-- **Andrew Harrison**
-- **Sudhir Ray**
-- Team 9 — Database Systems Project (Dr. Lopa)
-
+- **Ajas Mohammed**
 ---
 
 ## 📁 Repository Structure
